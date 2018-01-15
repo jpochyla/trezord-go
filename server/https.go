@@ -18,6 +18,8 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+
+	"sync"
 )
 
 type session struct {
@@ -31,6 +33,8 @@ type server struct {
 	bus      *usb.USB
 	sessions map[string]*session
 }
+
+var mutex = &sync.Mutex{}
 
 func New(bus *usb.USB) (*server, error) {
 	certs, err := downloadCerts()
@@ -140,6 +144,9 @@ func (s *server) Enumerate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) enumerate() ([]entry, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	infos, err := s.bus.Enumerate()
 	if err != nil {
 		return nil, err
@@ -167,6 +174,9 @@ var (
 )
 
 func (s *server) Acquire(w http.ResponseWriter, r *http.Request) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	vars := mux.Vars(r)
 	path := vars["path"]
 	prev := vars["session"]
@@ -210,6 +220,9 @@ func (s *server) Acquire(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) Release(w http.ResponseWriter, r *http.Request) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	vars := mux.Vars(r)
 	session := vars["session"]
 
@@ -226,6 +239,9 @@ func (s *server) Release(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) Call(w http.ResponseWriter, r *http.Request) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	vars := mux.Vars(r)
 	session := vars["session"]
 
