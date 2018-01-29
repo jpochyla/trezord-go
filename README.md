@@ -18,5 +18,6 @@ Prerequisities:
 
 Then:
 * `cd ~/go/src/github.com/jpochyla/trezord-go`
-* `xgo --targets=windows/amd64,windows/386,darwin/amd64,darwin/386,linux/amd64,linux/386,linux/arm-5,linux/arm-6,linux/arm-7,linux/arm64,linux/mips64,linux/mips64le,linux/mips,linux/mipsle`
+* `xgo -ldflags='-w -s' --targets=windows/amd64,windows/386,darwin/amd64,linux/amd64,linux/386`
  or any subset of the targets
+  * `-ldflags='-w -s'` is for omitting symbol table, which makes the binary smaller. In case of problems remove it `
